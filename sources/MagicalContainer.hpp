@@ -15,6 +15,7 @@ namespace ariel
     {
     private:
         std::vector<int> elements;
+        std::vector<int> primes; // holds the indexes for prime nums in the sorted container (=elements)
 
     public:
         MagicalContainer();
@@ -57,7 +58,7 @@ namespace ariel
         // Overload the dereference operator
         int operator*() const
         {
-            return container.elements[currentIndex];
+            return container.elements.at(currentIndex);
         }
 
         // Overload the prefix increment operator
@@ -66,6 +67,9 @@ namespace ariel
             ++currentIndex;
             return *this;
         }
+
+        // assignment operator
+        AscendingIterator &operator=(const AscendingIterator &other);
 
         // Overload the equality operator
         bool operator==(const AscendingIterator &other) const
@@ -105,7 +109,7 @@ namespace ariel
         // Overload the dereference operator
         int operator*() const
         {
-            return container.elements[currentIndex];
+            return  container.elements.at(currentIndex);
         }
         // Overload the prefix increment operator
         SideCrossIterator &operator++()
@@ -125,6 +129,15 @@ namespace ariel
         {
             return !(*this == other);
         }
+        bool operator<(const SideCrossIterator &other) const
+        {
+            return false;
+        }
+
+        bool operator>(const SideCrossIterator &other) const
+        {
+            return false;
+        }
     };
 
     class MagicalContainer::PrimeIterator
@@ -136,13 +149,13 @@ namespace ariel
     public:
         PrimeIterator(MagicalContainer &container, size_t currentIndex = 0)
             : container(container), currentIndex(currentIndex) {}
-        
+
         PrimeIterator begin() { return PrimeIterator(container, 0); };
         PrimeIterator end() { return PrimeIterator(container, container.size()); };
-        
+
         int operator*() const
         {
-            return container.elements[currentIndex];
+            return  container.elements.at(currentIndex);
         }
         // Overload the prefix increment operator
         PrimeIterator &operator++()
@@ -161,6 +174,16 @@ namespace ariel
         bool operator!=(const PrimeIterator &other) const
         {
             return !(*this == other);
+        }
+
+        bool operator<(const PrimeIterator &other) const
+        {
+            return false;
+        }
+
+        bool operator>(const PrimeIterator &other) const
+        {
+            return false;
         }
     };
 

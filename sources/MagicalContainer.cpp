@@ -18,4 +18,15 @@ namespace ariel
     {
     }
 
+    MagicalContainer::AscendingIterator &MagicalContainer::AscendingIterator::operator=(const AscendingIterator &other)
+    {
+        // TODO: insert return statement here
+                    if (this != &other)
+            {
+                container = other.container;
+                currentIndex = other.currentIndex;
+            }
+            return *this;
+    }
+
 }
