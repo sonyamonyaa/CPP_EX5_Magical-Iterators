@@ -83,4 +83,27 @@ To simplify the implementation, we will ignore the case where an iterator points
 
 אין לשנות קבצים קיימים אלא רק להוסיף קבצים חדשים.
 
+**חלק ב**: יש לכתוב: 
+
+*מימוש מלא למטלה כדי שהטסט יעבור.
+  
+כיתבו את כל הקבצים הדרושים כך שהפקודות הבאות יעבדו ללא שגיאות:
+
+<div dir='ltr'>
+
+	bash grade
+
+</div>
+
+מומלץ גם להריץ:
+
+<div dir='ltr'>
+
+    make tidy
+    make valgrind
+
+</div>
+
+אין לשנות קבצים קיימים אלא רק להוסיף קבצים חדשים.
+
 בהצלחה

@@ -3,188 +3,115 @@
 
 namespace ariel
 {
-    // TODO: add check if same container
-    /**
-     * Create a user-defined container class named "MagicalContainer" that can store integers representing mystical elements.
-     * Implement necessary methods for adding elements,
-     * removing elements,
-     * retrieving the size of the container.
-     * You can use a dynamic array or any other suitable data structure for internal storage.
-     */
+    enum class iterTypes : char
+    {
+        ascend = 'a',
+        cross = 'c',
+        prime = 'p'
+    };
+
     class MagicalContainer
     {
     private:
         std::vector<int> elements;
-        std::vector<int> primes; // holds the indexes for prime nums in the sorted container (=elements)
+        std::vector<int *> primes; // holds the pointers for prime nums in the sorted container (=elements)
+        class BasicIterator;
 
     public:
-        MagicalContainer();
         void addElement(int elem); // adds as a sorted
         void removeElement(int elem);
         size_t size() { return elements.size(); };
-        ~MagicalContainer();
 
         class AscendingIterator;
         class SideCrossIterator;
         class PrimeIterator;
+
+        MagicalContainer() = default;
+        ~MagicalContainer();
+        MagicalContainer(const MagicalContainer &) = default;
+        MagicalContainer &operator=(const MagicalContainer &) = default;
+        MagicalContainer(MagicalContainer &&) noexcept = default;
+        MagicalContainer &operator=(MagicalContainer &&) noexcept = default;
     };
-    /**
-     * Each iterator should support the following operations:
-     * Default constructor
-     * Copy constructor
-     * Destructor
-     * Assignment operator
-     * Equality comparison (operator==)
-     * Inequality comparison (operator!=)
-     * GT, LT comparison (operator>, operatorn<) all comparison operators only valid for iterators of the same type of order and should compair the location of the iterator in the container and not the element inside. Example bellow. Using operators on iterators of differant type or differant containers should throw an examtion.
-     * Dereference operator (operator*)
-     * Pre-increment operator (operator++)
-     * begin(type): Returns the appropriate iterator (ascending, cross, or prime) pointing to the first element of the container based on the specified type.
-     * end(type): Returns the appropriate iterator (ascending, cross, or prime) pointing one position past the last element of the container based on the specified type.
-     */
-    class MagicalContainer::AscendingIterator
+
+    class MagicalContainer::BasicIterator
     {
+    protected:
+        MagicalContainer *container;
+        size_t index;
+        void checkContainers(const BasicIterator &other) const;
     private:
-        MagicalContainer &container;
-        size_t currentIndex;
+        iterTypes type;
+        void checkTypes(const BasicIterator &other) const;
 
     public:
-        AscendingIterator(MagicalContainer &container, size_t currentIndex = 0)
-            : container(container), currentIndex(currentIndex) {}
+        BasicIterator(MagicalContainer &container, size_t index = 0, iterTypes type = iterTypes::ascend)
+            : container(&container), index(index), type(type) {}
+        BasicIterator(const BasicIterator &other) : container(other.container), index(other.index) {}
+        ~BasicIterator() = default;
+        BasicIterator(BasicIterator &&other) noexcept = default;
+        BasicIterator &operator=(BasicIterator &&other) noexcept = default;
+        // BasicIterator &operator=(const BasicIterator &other);
 
-        AscendingIterator begin() { return AscendingIterator(container, 0); };
-        AscendingIterator end() { return AscendingIterator(container, container.size()); };
+        bool operator==(const BasicIterator &other) const;
+        bool operator!=(const BasicIterator &other) const;
+        bool operator>(const BasicIterator &other) const;
+        bool operator<(const BasicIterator &other) const;
+    };
 
-        // Overload the dereference operator
-        int operator*() const
-        {
-            return container.elements.at(currentIndex);
-        }
+    class MagicalContainer::AscendingIterator : public MagicalContainer::BasicIterator
+    {
+    public:
+        AscendingIterator(MagicalContainer &container, size_t index = 0)
+            : BasicIterator(container, index, iterTypes::ascend) {}
 
-        // Overload the prefix increment operator
-        AscendingIterator &operator++()
-        {
-            ++currentIndex;
-            return *this;
-        }
-
-        // assignment operator
+        AscendingIterator(const AscendingIterator &other) : BasicIterator(other) {}
+        ~AscendingIterator() {}
         AscendingIterator &operator=(const AscendingIterator &other);
+        AscendingIterator begin() { return AscendingIterator(*container, 0); }
+        AscendingIterator end() { return AscendingIterator(*container, container->size()); }
 
-        // Overload the equality operator
-        bool operator==(const AscendingIterator &other) const
-        {
-            return currentIndex == other.currentIndex;
-        }
+        AscendingIterator &operator++();
+        int operator*() const;
 
-        // Overload the inequality operator
-        bool operator!=(const AscendingIterator &other) const
-        {
-            return !(*this == other);
-        }
-
-        bool operator<(const AscendingIterator &other) const
-        {
-            return false;
-        }
-
-        bool operator>(const AscendingIterator &other) const
-        {
-            return false;
-        }
+        AscendingIterator(AscendingIterator &&) noexcept = default;
+        AscendingIterator &operator=(AscendingIterator &&) noexcept = default;
     };
 
-    class MagicalContainer::SideCrossIterator
+    class MagicalContainer::SideCrossIterator : public MagicalContainer::BasicIterator
     {
-    private:
-        MagicalContainer &container;
-        size_t currentIndex;
-
     public:
-        SideCrossIterator(MagicalContainer &container, size_t currentIndex = 0)
-            : container(container), currentIndex(currentIndex) {}
+        SideCrossIterator(MagicalContainer &container, size_t index = 0)
+            : BasicIterator(container, index, iterTypes::cross) {}
 
-        SideCrossIterator begin() { return SideCrossIterator(container, 0); };
-        SideCrossIterator end() { return SideCrossIterator(container, container.size()); };
-        // Overload the dereference operator
-        int operator*() const
-        {
-            return  container.elements.at(currentIndex);
-        }
-        // Overload the prefix increment operator
-        SideCrossIterator &operator++()
-        {
-            ++currentIndex;
-            return *this;
-        }
+        SideCrossIterator(const SideCrossIterator &other) : BasicIterator(other) {}
+        ~SideCrossIterator() {}
+        SideCrossIterator &operator=(const SideCrossIterator &other);
+        SideCrossIterator begin() { return SideCrossIterator(*container, 0); }
+        SideCrossIterator end() { return SideCrossIterator(*container, container->size()); }
 
-        // Overload the equality operator
-        bool operator==(const SideCrossIterator &other) const
-        {
-            return currentIndex == other.currentIndex;
-        }
+        SideCrossIterator &operator++();
+        int operator*() const;
 
-        // Overload the inequality operator
-        bool operator!=(const SideCrossIterator &other) const
-        {
-            return !(*this == other);
-        }
-        bool operator<(const SideCrossIterator &other) const
-        {
-            return false;
-        }
-
-        bool operator>(const SideCrossIterator &other) const
-        {
-            return false;
-        }
+        SideCrossIterator(SideCrossIterator &&) noexcept = default;
+        SideCrossIterator &operator=(SideCrossIterator &&) noexcept = default;
     };
 
-    class MagicalContainer::PrimeIterator
+    class MagicalContainer::PrimeIterator : public MagicalContainer::BasicIterator
     {
-    private:
-        MagicalContainer &container;
-        size_t currentIndex;
-
     public:
-        PrimeIterator(MagicalContainer &container, size_t currentIndex = 0)
-            : container(container), currentIndex(currentIndex) {}
+        PrimeIterator(MagicalContainer &container, size_t index = 0)
+            : BasicIterator(container, index, iterTypes::prime) {}
+        PrimeIterator(const PrimeIterator &other) : BasicIterator(other) {}
+        ~PrimeIterator() {}
+        PrimeIterator &operator=(const PrimeIterator &other);
+        PrimeIterator begin() { return PrimeIterator(*container, 0); }
+        PrimeIterator end() { return PrimeIterator(*container, container->primes.size()); }
 
-        PrimeIterator begin() { return PrimeIterator(container, 0); };
-        PrimeIterator end() { return PrimeIterator(container, container.size()); };
+        PrimeIterator &operator++();
+        int operator*() const;
 
-        int operator*() const
-        {
-            return  container.elements.at(currentIndex);
-        }
-        // Overload the prefix increment operator
-        PrimeIterator &operator++()
-        {
-            ++currentIndex;
-            return *this;
-        }
-
-        // Overload the equality operator
-        bool operator==(const PrimeIterator &other) const
-        {
-            return currentIndex == other.currentIndex;
-        }
-
-        // Overload the inequality operator
-        bool operator!=(const PrimeIterator &other) const
-        {
-            return !(*this == other);
-        }
-
-        bool operator<(const PrimeIterator &other) const
-        {
-            return false;
-        }
-
-        bool operator>(const PrimeIterator &other) const
-        {
-            return false;
-        }
+        PrimeIterator(PrimeIterator &&) noexcept = default;
+        PrimeIterator &operator=(PrimeIterator &&) noexcept = default;
     };
-
-}
+}  // namespace ariel
